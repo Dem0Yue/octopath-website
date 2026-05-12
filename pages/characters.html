@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>角色档案 - Octopath Traveler</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* 角色页专属补充样式 */
+    .char-page-hero {
+      position: relative;
+      height: 380px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    }
+    .char-page-hero__overlay {
+      position: relative;
+      z-index: 2;
+      padding: 40px;
+      background: linear-gradient(transparent, rgba(13,17,23,0.95));
+      width: 100%;
+    }
+    .char-page-hero__name {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .char-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 20px 24px;
+      overflow-x: auto;
+      background: var(--color-bg-secondary);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: calc(var(--header-height) + var(--nav-height));
+      z-index: 10;
+    }
+    .char-tab {
+      flex-shrink: 0;
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .char-tab:hover {
+      border-color: var(--color-hover);
+      color: var(--color-hover);
+    }
+    .char-tab.active {
+      background: var(--gradient-primary);
+      border-color: transparent;
+      color: #fff;
+    }
+    .char-detail {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .char-card-detail {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 28px;
+    }
+    .char-card-detail h3 {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .cmd-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(201, 162, 39, 0.15);
+      border: 1px solid rgba(201, 162, 39, 0.4);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: var(--color-gem);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .skill-tag {
+      padding: 5px 12px;
+      background: rgba(110, 64, 170, 0.15);
+      border: 1px solid rgba(110, 64, 170, 0.35);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--color-hover);
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.85rem;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: var(--color-text-muted); }
+    .stat-value { color: var(--color-text-primary); font-weight: 600; }
+    /* 可编辑表格 */
+    .editable-table-wrap {
+      position: relative;
+    }
+    .btn-edit-table {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 6px 14px;
+      font-size: 0.75rem;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      color: var(--color-link);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: none;
+    }
+    .btn-edit-table.visible { display: block; }
+    .btn-edit-table:hover { border-color: var(--color-link); background: rgba(77,159,255,0.1); }
+    .editable-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .editable-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--color-bg-secondary);
+      color: var(--color-text-muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .editable-table td {
+      padding: 10px 14px;
+      color: var(--color-text-primary);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .editable-table td[contenteditable="true"] {
+      background: rgba(110, 64, 170, 0.08);
+      outline: 1px solid var(--color-hover);
+      border-radius: 4px;
+      cursor: text;
+    }
+    @media (max-width: 768px) {
+      .char-detail { grid-template-columns: 1fr; }
+      .char-page-hero { height: 280px; }
+      .char-page-hero__name { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 顶部标题栏 -->
+  <header class="site-header">
+    <div class="header__left">
+      <span class="header__logo">OCTOPATH</span>
+      <span class="header__subtitle">八方旅人 · HD-2D</span>
+    </div>
+    <div class="header__right">
+      <div class="clock-widget" id="clockWidget">00:00:00</div>
+      <div class="countdown-widget" id="countdownWidget">--:--:--</div>
+      <button class="btn-login" id="btnLogin">登 录</button>
+      <div class="user-info" id="userInfo" style="display:none;">
+        <span class="gem-dot"></span>
+        <span class="user-name" id="userName"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 导航栏 -->
+  <nav class="site-nav">
+    <ul class="nav__primary">
+      <li class="nav__item"><a class="nav__link" href="../index.html">首页</a></li>
+      <li class="nav__item active">
+        <a class="nav__link" href="characters.html">角色档案</a>
+        <ul class="nav__sub">
+          <li class="nav__sub-item"><a href="characters.html">全部角色</a></li>
+        </ul>
+      </li>
+      <li class="nav__item"><a class="nav__link" href="jobs.html">职业系统</a></li>
+      <li class="nav__item"><a class="nav__link" href="world.html">大陆纪行</a></li>
+      <li class="nav__item"><a class="nav__link" href="story.html">剧情之旅</a></li>
+      <li class="nav__item"><a class="nav__link" href="battle.html">战斗指南</a></li>
+      <li class="nav__item"><a class="nav__link" href="gallery.html">画廊</a></li>
+      <li class="nav__item"><a class="nav__link" href="pubmed.html">文献检索</a></li>
+    </ul>
+  </nav>
+
+  <main style="margin-top: calc(var(--header-height) + var(--nav-height));">
+
+    <!-- 角色切换 Tab -->
+    <div class="char-tabs" id="charTabs"></div>
+
+    <!-- 角色详情区 -->
+    <div class="char-detail" id="charDetail">
+      <!-- 动态填充 -->
+    </div>
+
+    <!-- 职业属性总表（可编辑） -->
+    <div class="section" style="max-width:1100px;margin:0 auto;padding:0 24px 60px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <h2 class="section-title" style="margin:0;">八大职业一览</h2>
+        <span style="font-size:0.75rem;color:var(--color-text-muted);">登录后即可编辑</span>
+      </div>
+      <div class="editable-table-wrap">
+        <button class="btn-edit-table" id="btnEditTable">编辑表格</button>
+        <table class="editable-table" id="jobsTable">
+          <thead>
+            <tr>
+              <th>职业</th>
+              <th>角色</th>
+              <th>武器</th>
+              <th>属性</th>
+              <th>地图指令</th>
+              <th>定位</th>
+            </tr>
+          </thead>
+          <tbody id="jobsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 登录弹窗 -->
+  <div class="login-modal" id="loginModal">
+    <div class="login-modal__box">
+      <button class="btn-close" id="btnCloseLogin">×</button>
+      <h3 class="login-modal__title">旅人登录</h3>
+      <form id="loginForm" onsubmit="return handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">学号</label>
+          <input type="text" class="form-input" id="inputStudentId" placeholder="10位数字学号" maxlength="10" autocomplete="username">
+          <div class="form-error" id="idError"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" class="form-input" id="inputPassword" placeholder="初始密码：2026" autocomplete="current-password">
+          <div class="form-error" id="pwError"></div>
+        </div>
+        <button type="submit" class="btn-submit">进入旅途</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 底部 -->
+  <footer class="site-footer">
+    <div class="footer__links">
+      <a href="mailto:3139507341@qq.com">联系我们：3139507341@qq.com</a>
+    </div>
+    <p class="footer__copyright">© 2026 Octopath Traveler 主题网站 · Web编程大作业</p>
+  </footer>
+
+  <!-- 音乐条 -->
+  <div class="music-bar">
+    <div class="music-bar__info">
+      <span class="music-bar__gem"></span>
+      <span class="music-bar__track">游戏主旋律</span>
+    </div>
+    <div class="music-bar__controls">
+      <button class="btn-icon" onclick="alert('音乐功能演示中')">⏮</button>
+      <button class="btn-icon" onclick="alert('音乐功能演示中')">▶</button>
+      <button class="btn-icon" onclick="alert('音乐功能演示中')">⏭</button>
+    </div>
+  </div>
+
+  <script src="../js/main.js"></script>
+  <script>
+    // 角色页数据 + Tab 渲染
+    const CHARS = [
+      { id: 'olberic',   name: '欧贝利克', en: 'Olberic',    job: '剑士' },
+      { id: 'therion',   name: '提里昂',   en: 'Therion',    job: '盗贼' },
+      { id: 'haanit',    name: '海茵特',   en: "H'aanit",   job: '猎人' },
+      { id: 'primrose',  name: '普里姆萝斯', en: 'Primrose', job: '舞女' },
+      { id: 'cyrus',     name: '赛拉斯',   en: 'Cyrus',      job: '学者' },
+      { id: 'ophilia',   name: '奥菲利亚', en: 'Ophilia',    job: '神官' },
+      { id: 'alfyn',     name: '阿芬',     en: 'Alfyn',      job: '药师' },
+      { id: 'tressa',    name: '特蕾莎',   en: 'Tressa',     job: '商人' },
+    ];
+
+    const charData = {
+      olberic: { name:'欧贝利克',en:'Olberic',job:'剑士',hometown:'柯鲁帝亚王国',cmd:'决斗',cmdDesc:'与NPC进行模拟比武，胜利后可获得经验与道具',bg:'曾是柯鲁帝亚王国的王家骑士，在王国覆灭后失去了一切。如今以四处旅行的佣兵身份活着，直到他找到了新的战斗意义——守护弱者。',skills:['横一文字斩','蓄力','一番枪','挑拨','十文字斩','鉄壁'],weapon:'剑/枪',elem:'无属性',role:'物理肉盾/副输出' },
+      therion: { name:'提里昂',en:'Therion',job:'盗贼',hometown:'不知',cmd:'偷盗',cmdDesc:'从NPC身上偷取稀有道具，但失败会增加邪道值',bg:'神秘的盗贼，身上背负着某个被封印的诅咒。过去是一片空白，只知道他有一枚神秘吊坠，与一段痛苦的记忆紧紧相连。',skills:['偷盗','上锁','暗器投掷','隐蔽','毒刃'],weapon:'短剑/剑',elem:'暗属性',role:'单体物理输出' },
+      haanit: { name:'海茵特',en:"H'aanit",job:'猎人',hometown:'爱德拉斯城',cmd:'指使',cmdDesc:'命令魔物为NPC服务，可获得经验、道具或移动NPC位置',bg:'来自爱德拉斯城的女猎人，师父被魔物带走后，她踏上寻找师父的旅程。她的搭档是雪豹「琳德」。',skills:['乱射','会心之矢','电鸟','网','目标锁定'],weapon:'弓/斧',elem:'雷属性',role:'综合输出' },
+      primrose: { name:'普里姆萝斯',en:'Primrose',job:'舞女',hometown:'周日之国',cmd:'诱惑',cmdDesc:'让NPC加入队伍短暂协助战斗，失败增加邪道值',bg:"周日之国的贵族千金，父亲被三位绅士暗杀。为复仇苦练剑术的她，优雅舞步中隐藏着复仇者的锋芒。",skills:['舞蹈','希望之歌','诱惑之舞','齐心协力','月影'],weapon:'短剑',elem:'风属性',role:'增益辅助' },
+      cyrus: { name:'赛拉斯',en:'Cyrus',job:'学者',hometown:'克雷斯摩根图书馆',cmd:'调查',cmdDesc:'暗地里调查NPC获取情报，胜利后可了解隐藏信息',bg:'克雷斯摩根图书馆的学者，在调查古代文献时发现恩师被卷入了某个阴谋。为寻找恩师下落，他踏遍奥鲁斯特拉大陆。',skills:['火炎魔法','冰结魔法','雷击魔法','予习','大魔法'],weapon:'杖',elem:'火/冰/雷属性',role:'法系输出核心' },
+      ophilia: { name:'奥菲利亚',en:'Ophilia',job:'神官',hometown:'圣火教团',cmd:'导引',cmdDesc:'引导NPC暂时加入队伍，导引的NPC可在战斗中使用',bg:'圣火教团的神官，为完成教团使命与挚友莉莎珞一同踏上旅途。在旅途中学到了信仰的真正含义。',skills:['回复魔法','圣光','守护','大回复魔法','复活魔法'],weapon:'杖',elem:'光属性',role:'奶妈/副法输出' },
+      alfyn: { name:'阿芬',en:'Alfyn',job:'药师',hometown:'维雅布鲁克村',cmd:'调药',cmdDesc:'将采集的草药调和为药水，可对NPC使用恢复HP或获得情报',bg:'维雅布鲁克村长大的药师，在旅途中救死扶伤，用调配的药物治疗每一位需要帮助的人，即使对方是曾经的敌人。',skills:['调药','毒药','体力药剂','活力灵药','调和'],weapon:'斧',elem:'冰属性',role:'减益辅助' },
+      tressa: { name:'特蕾莎',en:'Tressa',job:'商人',hometown:'港口城市戈尔戈农',cmd:'雇用',cmdDesc:'雇用NPC成为临时伙伴协助战斗或服务，每次消耗叶币',bg:'戈尔戈农港口城市长大的少女，从小跟随商队走南闯北。在一次遭遇海盗后，她决定亲自踏上旅途，寻找「那个人」的秘密。',skills:['雇用','物品收集','全员激励','讨价还价','连携攻击'],weapon:'长枪/弓',elem:'火属性',role:'综合辅助' },
+    };
+
+    // 渲染 Tab
+    const tabsEl = document.getElementById('charTabs');
+    CHARS.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'char-tab' + (c.id === 'olberic' ? ' active' : '');
+      btn.textContent = c.name;
+      btn.onclick = () => switchChar(c.id);
+      tabsEl.appendChild(btn);
+    });
+
+    function switchChar(id) {
+      // Tab 状态
+      tabsEl.querySelectorAll('.char-tab').forEach((t, i) => {
+        t.classList.toggle('active', CHARS[i].id === id);
+      });
+      // 渲染详情
+      const c = charData[id];
+      const skillsHtml = c.skills.map(s => `<span class="skill-tag">${s}</span>`).join('');
+      document.getElementById('charDetail').innerHTML = `
+        <div class="char-card-detail">
+          <h3>💎 地图指令</h3>
+          <div class="cmd-badge">「${c.cmd}」</div>
+          <p style="font-size:0.85rem;color:#8b949e;margin-bottom:20px;">${c.cmdDesc}</p>
+          <h3>📖 背景故事</h3>
+          <p style="font-size:0.9rem;color:#8b949e;line-height:1.7;">${c.bg}</p>
+        </div>
+        <div class="char-card-detail">
+          <h3>⚔️ 战斗技能</h3>
+          <div class="skill-tags" style="margin-bottom:24px;">${skillsHtml}</div>
+          <h3>📊 基础属性</h3>
+          <div class="stat-row"><span class="stat-label">武器</span><span class="stat-value">${c.weapon}</span></div>
+          <div class="stat-row"><span class="stat-label">属性</span><span class="stat-value">${c.elem}</span></div>
+          <div class="stat-row"><span class="stat-label">出身地</span><span class="stat-value">${c.hometown}</span></div>
+          <div class="stat-row"><span class="stat-label">职业定位</span><span class="stat-value" style="color:var(--color-hover);">${c.role}</span></div>
+        </div>
+      `;
+    }
+
+    // 渲染职业总表
+    const jobsBody = document.getElementById('jobsTableBody');
+    CHARS.forEach(c => {
+      const d = charData[c.id];
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="color:var(--color-hover);font-weight:600;">${d.job}</td>
+        <td>${d.name}</td>
+        <td>${d.weapon}</td>
+        <td>${d.elem}</td>
+        <td>「${d.cmd}」</td>
+        <td>${d.role}</td>
+      `;
+      jobsBody.appendChild(tr);
+    });
+
+    // 可编辑表格（登录后才可用）
+    const btnEditTable = document.getElementById('btnEditTable');
+    let isTableEditable = false;
+
+    if (btnEditTable) {
+      btnEditTable.addEventListener('click', () => {
+        if (!isLoggedIn) { alert('请先登录后编辑'); return; }
+        isTableEditable = !isTableEditable;
+        const cells = document.querySelectorAll('#jobsTableBody td');
+        cells.forEach(td => td.contentEditable = isTableEditable);
+        btnEditTable.textContent = isTableEditable ? '保存退出' : '编辑表格';
+        if (!isTableEditable) { isTableEditable = false; }
+      });
+    }
+
+    // 初始化显示
+    switchChar('olberic');
+  </script>
+
+</body>
+</html>

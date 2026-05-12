@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>剧情之旅 - Octopath Traveler</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* PPT 翻页样式 */
+    .ppt-container {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin: 40px auto;
+      overflow: hidden;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+      min-height: 420px;
+    }
+    .ppt-slide {
+      display: none;
+      padding: 48px 56px;
+      animation: slideIn 0.4s ease forwards;
+    }
+    .ppt-slide.active { display: block; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(30px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .ppt-char-label {
+      display: inline-block;
+      padding: 4px 14px;
+      background: var(--gradient-primary);
+      border-radius: 20px;
+      font-size: 0.7rem;
+      color: #fff;
+      letter-spacing: 0.15em;
+      margin-bottom: 20px;
+    }
+    .ppt-chapter {
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .ppt-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+    }
+    .ppt-text {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      line-height: 1.9;
+      margin-bottom: 24px;
+    }
+    .ppt-img-placeholder {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%);
+      border-radius: var(--border-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+    }
+    .ppt-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+      border-top: 1px solid var(--color-border);
+    }
+    .ppt-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .ppt-btn:hover { border-color: var(--color-hover); color: var(--color-hover); }
+    .ppt-dots {
+      display: flex; gap: 8px;
+    }
+    .ppt-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--color-border);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ppt-dot.active {
+      background: var(--color-hover);
+      transform: scale(1.3);
+    }
+    .ppt-counter {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      font-family: var(--font-pixel);
+      min-width: 60px;
+      text-align: center;
+    }
+    /* 角色筛选 */
+    .char-filter {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px 24px;
+      background: var(--color-bg-secondary);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .char-filter__btn {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .char-filter__btn.active,
+    .char-filter__btn:hover {
+      background: var(--gradient-primary);
+      border-color: transparent;
+      color: #fff;
+    }
+    .section { padding: 60px 24px; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header__left">
+      <span class="header__logo">OCTOPATH</span>
+      <span class="header__subtitle">八方旅人 · HD-2D</span>
+    </div>
+    <div class="header__right">
+      <div class="clock-widget" id="clockWidget">00:00:00</div>
+      <div class="countdown-widget" id="countdownWidget">--:--:--</div>
+      <button class="btn-login" id="btnLogin">登 录</button>
+      <div class="user-info" id="userInfo" style="display:none;">
+        <span class="gem-dot"></span>
+        <span class="user-name" id="userName"></span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <ul class="nav__primary">
+      <li class="nav__item"><a class="nav__link" href="../index.html">首页</a></li>
+      <li class="nav__item"><a class="nav__link" href="characters.html">角色档案</a></li>
+      <li class="nav__item"><a class="nav__link" href="jobs.html">职业系统</a></li>
+      <li class="nav__item"><a class="nav__link" href="world.html">大陆纪行</a></li>
+      <li class="nav__item active"><a class="nav__link" href="story.html">剧情之旅</a></li>
+      <li class="nav__item"><a class="nav__link" href="battle.html">战斗指南</a></li>
+      <li class="nav__item"><a class="nav__link" href="gallery.html">画廊</a></li>
+      <li class="nav__item"><a class="nav__link" href="pubmed.html">文献检索</a></li>
+    </ul>
+  </nav>
+
+  <main style="margin-top: calc(var(--header-height) + var(--nav-height));">
+    <div class="section">
+      <h2 class="section-title">剧情之旅</h2>
+      <p class="section-subtitle">八位旅人 · 八段命运 · 体验章节故事</p>
+    </div>
+
+    <!-- 角色筛选 -->
+    <div class="char-filter" id="charFilter"></div>
+
+    <!-- PPT 翻页区 -->
+    <div class="ppt-container" id="pptContainer">
+      <div id="pptSlides"><!-- 动态 --></div>
+      <div class="ppt-nav">
+        <button class="ppt-btn" id="btnPrev" title="上一页 (←)">←</button>
+        <div class="ppt-dots" id="pptDots"></div>
+        <span class="ppt-counter" id="pptCounter">1 / 4</span>
+        <button class="ppt-btn" id="btnNext" title="下一页 (→)">→</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer__links">
+      <a href="mailto:3139507341@qq.com">联系我们：3139507341@qq.com</a>
+    </div>
+    <p class="footer__copyright">© 2026 Octopath Traveler 主题网站</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script>
+    // 剧情数据
+    const STORY = {
+      olberic: [
+        { chapter:'第一章', title:'覆灭的王国', content:'欧贝利克曾是柯鲁帝亚王国最强的王家骑士，然而王国在一场阴谋中覆灭。他失去了一切——祖国、战友、以及身为骑士的意义。带着残破的剑与迷茫的内心，他来到边境小镇……', img:'剑士章节一场景' },
+        { chapter:'第二章', title:'佣兵之路', content:'在小镇上，欧贝利克遇到了一位年轻佣兵，对方向他发起了挑战。在决斗中，他仿佛看到了过去的自己。这场战斗唤醒了他心中沉睡已久的斗志。', img:'剑士章节二场景' },
+        { chapter:'第三章', title:'故人的影子', content:'欧贝利克来到王国旧都，遇见了曾经的战友遗孤。从对方口中，他得知了当年那场背叛的更多细节。一段被掩埋的历史逐渐浮出水面。', img:'剑士章节三场景' },
+        { chapter:'终章', title:'骑士之道', content:'面对王国的废墟，欧贝利克终于找到了答案。骑士的剑不再为王国而挥，而是为守护眼前的弱者而战。他重新举起剑，踏上了新的旅途。', img:'剑士终章场景' },
+      ],
+      primrose: [
+        { chapter:'第一章', title:'三位绅士', content:'周日之国的贵族千金普里姆萝斯，在父亲葬礼上见到了三位衣冠楚楚的绅士。他们微笑着参加了葬礼，却正是暗杀父亲的凶手。她决定隐忍，等待复仇的机会。', img:'舞女章节一场景' },
+        { chapter:'第二章', title:'暗之舞', content:'普里姆萝斯拜入舞坊，用优雅的舞姿掩盖复仇的决心。在舞坊中她发现了父亲的旧日志，其中记载了某条重要线索——三位绅士背后还有更大的势力。', img:'舞女章节二场景' },
+        { chapter:'第三章', title:'父亲的理由', content:'追查中，普里姆萝斯发现父亲并非无辜：他曾参与某个禁忌计划。三位绅士其实是来「灭口」的。她的复仇之心产生了动摇……', img:'舞女章节三场景' },
+        { chapter:'终章', title:'舞踏真意', content:'普里姆萝斯终于找到三位绅士，将他们一一击败。但真正的敌人是自己的心魔。她理解了父亲的苦衷，也找到了属于自己的舞踏之道。', img:'舞女终章场景' },
+      ],
+      cyrus: [
+        { chapter:'第一章', title:'禁书库的秘密', content:'克雷斯摩根图书馆的学者赛拉斯，在研究禁忌文献时发现恩师已失踪数月。他利用学者特有的「调查」指令，逐渐揭开图书馆地下隐藏的惊天秘密。', img:'学者章节一场景' },
+        { chapter:'第二章', title:'消失的恩师', content:'赛拉斯追查恩师的足迹，发现他曾研究过一种能操控记忆的古代魔法。然而这魔法需要以活人为祭品……他的恩师究竟是受害者，还是共犯？', img:'学者章节二场景' },
+        { chapter:'第三章', title:'记忆迷宫', content:'在古老遗迹中，赛拉斯发现了一面能映照真相的魔镜。镜中浮现的记忆告诉他：恩师是为了阻止某个阴谋而自愿牺牲的。', img:'学者章节三场景' },
+        { chapter:'终章', title:'真理之杖', content:'赛拉斯用学者的智慧破解了最后的谜题，救出了被困的恩师。他明白了知识本身并无善恶，关键在于使用知识的人。他举起法杖，继续追求真理之旅。', img:'学者终章场景' },
+      ],
+      ophilia: [
+        { chapter:'第一章', title:'圣火与试炼', content:'奥菲利亚是圣火教团的见习神官，为完成「导引」试炼而踏上旅途。她的挚友莉莎珞陪伴在侧，然而一场突如其来的灾难将两人分开。', img:'神官章节一场景' },
+        { chapter:'第二章', title:'离别之道', content:'奥菲利亚得知莉莎珞被某个邪教组织掳走。她穿越被黑暗笼罩的村落，用神官的神圣之光驱散恐惧，逐渐接近真相。', img:'神官章节二场景' },
+        { chapter:'第三章', title:'信仰的动摇', content:'在圣火教团总部，奥菲利亚发现教团高层与邪教有着千丝万缕的联系。她一直以来的信仰遭遇了前所未有的危机。', img:'神官章节三场景' },
+        { chapter:'终章', title:'圣火之心', content:'奥菲利亚在绝望中重新点燃了内心的圣火。她认识到信仰不是依赖神，而是相信自己内心的光。她从邪教手中救出了莉莎珞，也完成了真正的试炼。', img:'神官终章场景' },
+      ],
+      therion: [
+        { chapter:'第一章', title:'禁忌之锁', content:'盗贼提里昂受神秘委托，前往废弃城堡盗取一件被封印的宝物。然而他触发了诅咒，身上那枚神秘吊坠开始灼烧——他失去了一段关键记忆。', img:'盗贼章节一场景' },
+        { chapter:'第二章', title:'哥哥的身影', content:'提里昂在追查诅咒来源时，脑海中反复出现一个男孩的身影——那是他的哥哥。在盗贼工会的情报网中，他发现哥哥曾卷入一场巨大的阴谋。', img:'盗贼章节二场景' },
+        { chapter:'第三章', title:'吊坠的真相', content:'通过调查，提里昂得知吊坠是封印某个魔神的钥匙，而哥哥为了阻止魔神觉醒自愿牺牲，将钥匙托付给了年幼的弟弟保管。', img:'盗贼章节三场景' },
+        { chapter:'终章', title:'解放之键', content:'提里昂面对当年事件的幕后黑手，用计谋和武力将其击败。他将吊坠交还给了它应有的归宿，也终于释放了哥哥的灵魂。从仇恨中解脱的他，选择继续作为盗贼浪迹天涯。', img:'盗贼终章场景' },
+      ],
+      haanit: [
+        { chapter:'第一章', title:'师父不在的日子', content:'海茵特是爱德拉斯城的猎人，她的师父「雷丸」在一次讨伐魔物的任务中失踪了。海茵特带着她最好的搭档——雪豹琳德，踏上了寻找师父的旅程。', img:'猎人章节一场景' },
+        { chapter:'第二章', title:'魔物猎人', content:'在追踪师父下落的过程中，海茵特发现了魔物异常活跃的规律。她利用猎人的「指使」技能，驯服了数只强大的魔物，逐渐逼近真相。', img:'猎人章节二场景' },
+        { chapter:'第三章', title:'师父的过去', content:'从一位老猎人那里，海茵特得知师父年轻时曾是声名显赫的「魔物使」。但一次背叛让他心灰意冷，退隐山林。背叛他的人，现在还活着。', img:'猎人章节三场景' },
+        { chapter:'终章', title:'雪豹之誓', content:'海茵特找到师父，与他一同面对当年的敌人。在琳德和师父的魔物们的帮助下，她击败了幕后黑手。师父承认海茵特已超越自己，将「真传」托付给她。', img:'猎人终章场景' },
+      ],
+      alfyn: [
+        { chapter:'第一章', title:'药师的背包', content:'在维雅布鲁克村长大的药师阿芬，在村外遇到了一位濒死的重伤旅人。救死扶伤的本能让他出手相救，却没想到这位旅人的身份极为特殊……', img:'药师章节一场景' },
+        { chapter:'第二章', title:'调和之艺', content:'阿芬在旅途中为各地村民治病，用「调药」技能制作了无数药剂。但他也遇到了无药可救的病患——一种神秘的瘟疫正在西部地区蔓延。', img:'药师章节二场景' },
+        { chapter:'第三章', title:'毒与药', content:'调查后阿芬发现，瘟疫的源头竟是他曾救治过的一位商人——对方的企业无意中污染了水源。阿芬陷入了制药救人与惩戒真凶的两难。', img:'药师章节三场景' },
+        { chapter:'终章', title:'药师之道', content:'阿芬用智慧找到了净化水源的方法，同时感化了商人使其承担后果。他理解了药师的终极奥义：药能治病，却治不了人心；而药师能做的，就是永远不放弃治愈的可能。', img:'药师终章场景' },
+      ],
+      tressa: [
+        { chapter:'第一章', title:'海港的记忆', content:'港口城市戈尔戈农长大的少女特蕾莎，在一次海难后捡到了一本漂流日记。日记中记载着一位少年航海家发现新大陆的秘密。她决定追随日记的指引，出海寻找真相。', img:'商人章节一场景' },
+        { chapter:'第二章', title:'叶币的重量', content:'特蕾莎利用商人的「雇用」技能，雇佣各种能人异士协助调查。她发现日记中的少年是自己的远房亲戚，而他的失踪与某个海运公司有关。', img:'商人章节二场景' },
+        { chapter:'第三章', title:'海上霸者', content:'特蕾莎深入海运公司总部，用商人的谈判技巧套出了真相：海运公司为了垄断贸易，故意封锁了新航路。她的亲戚因为知道真相而被灭口。', img:'商人章节三场景' },
+        { chapter:'终章', title:'商人的浪漫', content:'特蕾莎击败了海运公司的首脑，解开了贸易封锁，让港口重新繁荣。她将亲戚的日记珍藏起来，继续作为商人环游世界，追寻更多未知的故事。', img:'商人终章场景' },
+      ],
+    };
+
+    const ALL_CHARS = [
+      { id:'olberic', name:'欧贝利克' },
+      { id:'therion', name:'提里昂' },
+      { id:'haanit', name:'海茵特' },
+      { id:'primrose', name:'普里姆萝斯' },
+      { id:'cyrus', name:'赛拉斯' },
+      { id:'ophilia', name:'奥菲利亚' },
+      { id:'alfyn', name:'阿芬' },
+      { id:'tressa', name:'特蕾莎' },
+    ];
+
+    let currentChar = 'olberic';
+    let currentSlide = 0;
+
+    // 渲染角色筛选
+    const filterEl = document.getElementById('charFilter');
+    ALL_CHARS.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'char-filter__btn' + (c.id === 'olberic' ? ' active' : '');
+      btn.textContent = c.name;
+      btn.onclick = () => { currentChar = c.id; currentSlide = 0; renderAll(); };
+      filterEl.appendChild(btn);
+    });
+
+    function renderSlides() {
+      const slides = STORY[currentChar];
+      const container = document.getElementById('pptSlides');
+      container.innerHTML = slides.map((s, i) => `
+        <div class="ppt-slide${i === 0 ? ' active' : ''}" data-index="${i}">
+          <div class="ppt-char-label">${ALL_CHARS.find(c => c.id === currentChar).name}</div>
+          <div class="ppt-chapter">${s.chapter}</div>
+          <h3 class="ppt-title">${s.title}</h3>
+          <img src="../图集/${currentChar}.${currentChar === 'therion' ? 'jpg' : 'png'}" alt="${s.img}" style="width:100%;height:200px;object-fit:cover;object-position:center top;border-radius:var(--border-radius-sm);margin-bottom:20px;background:#1a1a2e;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="ppt-img-placeholder" style="display:none;">【${s.img}】</div>
+          <p class="ppt-text">${s.content}</p>
+        </div>
+      `).join('');
+
+      // 圆点
+      const dotsEl = document.getElementById('pptDots');
+      dotsEl.innerHTML = slides.map((_, i) => `
+        <span class="ppt-dot${i === 0 ? ' active' : ''}" onclick="goToSlide(${i})"></span>
+      `).join('');
+    }
+
+    function goToSlide(index) {
+      const slides = STORY[currentChar];
+      if (index < 0) index = slides.length - 1;
+      if (index >= slides.length) index = 0;
+      currentSlide = index;
+
+      document.querySelectorAll('.ppt-slide').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+      document.querySelectorAll('.ppt-dot').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+      document.getElementById('pptCounter').textContent = `${index + 1} / ${slides.length}`;
+    }
+
+    document.getElementById('btnPrev').onclick = () => goToSlide(currentSlide - 1);
+    document.getElementById('btnNext').onclick = () => goToSlide(currentSlide + 1);
+
+    // 键盘翻页
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') goToSlide(currentSlide - 1);
+      if (e.key === 'ArrowRight') goToSlide(currentSlide + 1);
+    });
+
+    // 触摸滑动
+    let touchStartX = 0;
+    const pptEl = document.getElementById('pptContainer');
+    pptEl.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+    pptEl.addEventListener('touchend', e => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        diff > 0 ? goToSlide(currentSlide + 1) : goToSlide(currentSlide - 1);
+      }
+    });
+
+    function renderAll() {
+      filterEl.querySelectorAll('.char-filter__btn').forEach((btn, i) => {
+        btn.classList.toggle('active', ALL_CHARS[i].id === currentChar);
+      });
+      currentSlide = 0;
+      renderSlides();
+    }
+
+    renderSlides();
+  </script>
+</body>
+</html>

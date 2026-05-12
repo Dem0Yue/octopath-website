@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文献检索 - Octopath Traveler</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .pubmed-section { max-width:900px; margin:40px auto; padding:0 24px 60px; }
+    .search-box { background:var(--color-bg-card); border:1px solid var(--color-border); border-radius:var(--border-radius); padding:28px; margin-bottom:24px; }
+    .search-box h3 { font-size:0.9rem; color:var(--color-text-muted); letter-spacing:0.1em; margin-bottom:16px; text-transform:uppercase; }
+    .search-row { display:flex; gap:10px; flex-wrap:wrap; }
+    .search-input { flex:1; min-width:200px; padding:10px 16px; background:var(--color-bg); border:1px solid var(--color-border); border-radius:var(--border-radius-sm); color:var(--color-text-primary); font-size:0.9rem; outline:none; transition:border-color 0.2s; }
+    .search-input:focus { border-color:var(--color-hover); }
+    .btn-search { padding:10px 28px; background:var(--gradient-primary); color:#fff; border:none; border-radius:var(--border-radius-sm); font-size:0.85rem; font-weight:600; letter-spacing:0.1em; cursor:pointer; transition:opacity 0.2s; white-space:nowrap; }
+    .btn-search:hover { opacity:0.9; }
+    .search-tip { font-size:0.75rem; color:var(--color-text-muted); margin-top:10px; }
+    .result-card { background:var(--color-bg-card); border:1px solid var(--color-border); border-radius:var(--border-radius); padding:28px; margin-bottom:16px; display:none; }
+    .result-card.active { display:block; }
+    .result-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:12px; flex-wrap:wrap; }
+    .result-title { font-size:1rem; font-weight:700; color:var(--color-text-primary); line-height:1.5; flex:1; }
+    .result-meta { font-size:0.75rem; color:var(--color-text-muted); margin-top:6px; }
+    .result-abstract { font-size:0.875rem; color:var(--color-text-secondary); line-height:1.9; margin-top:12px; }
+    .result-authors { font-size:0.8rem; color:var(--color-text-muted); margin-top:8px; }
+    .result-keywords { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+    .kw-tag { padding:2px 10px; background:rgba(110,64,170,0.15); border:1px solid rgba(110,64,170,0.3); border-radius:20px; font-size:0.65rem; color:var(--color-hover); }
+    /* 分页导航 */
+    .result-nav { display:flex; align-items:center; justify-content:center; gap:16px; margin-top:24px; }
+    .nav-btn { width:36px; height:36px; border-radius:50%; background:var(--color-bg-secondary); border:1px solid var(--color-border); color:var(--color-text-secondary); font-size:0.9rem; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; }
+    .nav-btn:hover { border-color:var(--color-hover); color:var(--color-hover); }
+    .nav-counter { font-size:0.8rem; color:var(--color-text-muted); font-family:var(--font-pixel); min-width:80px; text-align:center; }
+    /* 加载动画 */
+    .loading { text-align:center; padding:40px; display:none; }
+    .loading.active { display:block; }
+    .loading-spinner { width:40px; height:40px; border:3px solid var(--color-border); border-top-color:var(--color-hover); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 12px; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+    .loading-text { font-size:0.8rem; color:var(--color-text-muted); }
+    /* 空结果 */
+    .empty-result { text-align:center; padding:40px; color:var(--color-text-muted); font-size:0.9rem; display:none; }
+    .empty-result.active { display:block; }
+    .section { padding:60px 24px 0; max-width:1400px; margin:0 auto; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header__left"><span class="header__logo">OCTOPATH</span><span class="header__subtitle">八方旅人 · HD-2D</span></div>
+    <div class="header__right">
+      <div class="clock-widget" id="clockWidget">00:00:00</div>
+      <div class="countdown-widget" id="countdownWidget">--:--:--</div>
+      <button class="btn-login" id="btnLogin">登 录</button>
+      <div class="user-info" id="userInfo" style="display:none;"><span class="gem-dot"></span><span class="user-name" id="userName"></span></div>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <ul class="nav__primary">
+      <li class="nav__item"><a class="nav__link" href="../index.html">首页</a></li>
+      <li class="nav__item"><a class="nav__link" href="characters.html">角色档案</a></li>
+      <li class="nav__item"><a class="nav__link" href="jobs.html">职业系统</a></li>
+      <li class="nav__item"><a class="nav__link" href="world.html">大陆纪行</a></li>
+      <li class="nav__item"><a class="nav__link" href="story.html">剧情之旅</a></li>
+      <li class="nav__item"><a class="nav__link" href="battle.html">战斗指南</a></li>
+      <li class="nav__item"><a class="nav__link" href="gallery.html">画廊</a></li>
+      <li class="nav__item active"><a class="nav__link" href="pubmed.html">文献检索</a></li>
+    </ul>
+  </nav>
+
+  <main style="margin-top:calc(var(--header-height) + var(--nav-height));">
+    <div class="section">
+      <h2 class="section-title">PubMed 文献检索</h2>
+      <p class="section-subtitle">NCBI Entrez API · Octopath Traveler 相关学术研究检索</p>
+    </div>
+
+    <div class="pubmed-section">
+      <!-- 检索表单 -->
+      <div class="search-box">
+        <h3>🔍 Entrez 文献检索</h3>
+        <div class="search-row">
+          <input type="text" class="search-input" id="searchInput"
+                 placeholder='例如: "Octopath Traveler" OR "HD-2D" OR "JRPG"'
+                 onkeydown="if(event.key==='Enter')doSearch()">
+          <button class="btn-search" onclick="doSearch()">检 索</button>
+        </div>
+        <div class="search-tip">
+          支持 PubMed 检索语法，如 <code style="color:var(--color-hover);">"Octopath Traveler"[Title]</code> 或 <code style="color:var(--color-hover);">JRPG[Title/Abstract]</code>。
+          默认返回前10条结果，登录后可修改默认数量。
+        </div>
+      </div>
+
+      <!-- 加载中 -->
+      <div class="loading" id="loadingEl">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">正在检索 PubMed 数据库...</div>
+      </div>
+
+      <!-- 空结果 -->
+      <div class="empty-result" id="emptyEl">
+        未找到相关文献，请尝试其他检索词。
+      </div>
+
+      <!-- 结果展示 -->
+      <div id="resultContainer"></div>
+
+      <!-- 分页导航 -->
+      <div class="result-nav" id="resultNav" style="display:none;">
+        <button class="nav-btn" onclick="prevResult()" title="上一页 (←)">←</button>
+        <span class="nav-counter" id="navCounter">1 / 10</span>
+        <button class="nav-btn" onclick="nextResult()" title="下一页 (→)">→</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer__links"><a href="mailto:3139507341@qq.com">联系我们：3139507341@qq.com</a></div>
+    <p class="footer__copyright">© 2026 Octopath Traveler 主题网站</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script>
+    let articles = [];
+    let currentIdx = 0;
+    const DEFAULT_RETMAX = 10;
+
+    function getRetmax() {
+      if (!isLoggedIn) return DEFAULT_RETMAX;
+      const saved = localStorage.getItem('octopath_pubmed_retmax');
+      return saved ? parseInt(saved) : DEFAULT_RETMAX;
+    }
+
+    async function doSearch() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) { alert('请输入检索词'); return; }
+
+      const loading = document.getElementById('loadingEl');
+      const empty = document.getElementById('emptyEl');
+      const container = document.getElementById('resultContainer');
+      const nav = document.getElementById('resultNav');
+
+      loading.classList.add('active');
+      empty.classList.remove('active');
+      container.innerHTML = '';
+      nav.style.display = 'none';
+      articles = [];
+      currentIdx = 0;
+
+      try {
+        const retmax = getRetmax();
+        const encodedQuery = encodeURIComponent(query);
+        const searchUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodedQuery}&retmax=${retmax}&retmode=xml`;
+
+        const resp = await fetch(searchUrl);
+        const xmlText = await resp.text();
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(xmlText, 'text/xml');
+
+        const ids = Array.from(xml.querySelectorAll('Id')).map(el => el.textContent);
+
+        if (ids.length === 0) {
+          loading.classList.remove('active');
+          empty.classList.add('active');
+          return;
+        }
+
+        // 获取详情
+        const fetchUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=${ids.join(',')}&retmode=xml`;
+        const detailResp = await fetch(fetchUrl);
+        const detailText = await detailResp.text();
+        const detailXml = parser.parseFromString(detailText, 'text/xml');
+
+        articles = Array.from(detailXml.querySelectorAll('PubmedArticle')).map(article => {
+          const medline = article.querySelector('MedlineCitation');
+          const pmid = medline?.querySelector('PMID')?.textContent || '';
+          const articleEl = medline?.querySelector('Article');
+          const title = articleEl?.querySelector('ArticleTitle')?.textContent || '无标题';
+          const abstract = articleEl?.querySelector('AbstractText')?.textContent || '无摘要';
+          const authors = Array.from(articleEl?.querySelectorAll('Author') || [])
+            .slice(0, 5)
+            .map(a => a.querySelector('LastName')?.textContent + (a.querySelector('Initials')?.textContent ? ' ' + a.querySelector('Initials').textContent : ''))
+            .filter(Boolean)
+            .join(', ');
+          const journal = articleEl?.querySelector('Journal')?.querySelector('Title')?.textContent || '';
+          const pubDate = articleEl?.querySelector('ArticleDate')?.textContent
+            || articleEl?.querySelector('JournalPublishedDate')?.textContent
+            || '';
+          const keywords = Array.from(article.querySelectorAll('Keyword')).map(k => k.textContent);
+
+          return { pmid, title, abstract, authors, journal, pubDate, keywords };
+        });
+
+        loading.classList.remove('active');
+        nav.style.display = 'flex';
+        renderResult(0);
+
+      } catch (err) {
+        loading.classList.remove('active');
+        container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--color-danger);">检索失败：${err.message}</div>`;
+      }
+    }
+
+    function renderResult(idx) {
+      currentIdx = idx;
+      const a = articles[idx];
+      const container = document.getElementById('resultContainer');
+      const navCounter = document.getElementById('navCounter');
+
+      container.innerHTML = `
+        <div class="result-card active">
+          <div class="result-header">
+            <div class="result-title">${a.title}</div>
+          </div>
+          <div class="result-meta">PMID: ${a.pmid} | ${a.journal} | ${a.pubDate}</div>
+          <div class="result-authors">${a.authors || '作者未知'}</div>
+          <div class="result-abstract"><strong>摘要：</strong>${a.abstract}</div>
+          ${a.keywords.length ? `<div class="result-keywords">${a.keywords.map(k => `<span class="kw-tag">${k}</span>`).join('')}</div>` : ''}
+        </div>
+      `;
+      navCounter.textContent = `${idx + 1} / ${articles.length}`;
+    }
+
+    function prevResult() {
+      if (currentIdx > 0) renderResult(currentIdx - 1);
+    }
+
+    function nextResult() {
+      if (currentIdx < articles.length - 1) renderResult(currentIdx + 1);
+    }
+
+    // 键盘导航
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') prevResult();
+      if (e.key === 'ArrowRight') nextResult();
+    });
+  </script>
+</body>
+</html>

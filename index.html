@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Octopath Traveler 八方旅人</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===================== 顶部标题栏 ===================== -->
+  <header class="site-header">
+    <div class="header__left">
+      <span class="header__logo">OCTOPATH</span>
+      <span class="header__subtitle">八方旅人 · HD-2D</span>
+    </div>
+    <div class="header__right">
+      <div class="clock-widget" id="clockWidget">00:00:00</div>
+      <div class="countdown-widget" id="countdownWidget" title="防沉迷倒计时">--:--:--</div>
+      <button class="btn-login" id="btnLogin">登 录</button>
+      <div class="user-info" id="userInfo" style="display:none;">
+        <span class="gem-dot"></span>
+        <span class="user-name" id="userName"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== 导航栏 ===================== -->
+  <nav class="site-nav">
+    <ul class="nav__primary">
+      <li class="nav__item active">
+        <a class="nav__link" href="#">首页</a>
+      </li>
+      <li class="nav__item">
+        <a class="nav__link" href="pages/characters.html">角色档案</a>
+        <ul class="nav__sub">
+          <li class="nav__sub-item"><a href="pages/characters.html">全部角色</a></li>
+          <li class="nav__sub-item"><a href="pages/characters.html#olberic">欧贝利克</a></li>
+          <li class="nav__sub-item"><a href="pages/characters.html#therion">提利昂</a></li>
+          <li class="nav__sub-item"><a href="pages/characters.html#haanit">海茵特</a></li>
+          <li class="nav__sub-item"><a href="pages/characters.html#primrose">普里姆萝斯</a></li>
+          <li class="nav__sub-item"><a href="pages/characters.html#cyrus">赛拉斯</a></li>
+          <li class="nav__sub-item"><a href="pages/characters.html#ophilia">奥菲利亚</a></li>
+          <li class="nav__sub-item"><a href="pages/characters.html#alfyn">阿芬</a></li>
+          <li class="nav__sub-item"><a href="pages/characters.html#tressa">特蕾莎</a></li>
+        </ul>
+      </li>
+      <li class="nav__item">
+        <a class="nav__link" href="pages/jobs.html">职业系统</a>
+      </li>
+      <li class="nav__item">
+        <a class="nav__link" href="pages/world.html">大陆纪行</a>
+      </li>
+      <li class="nav__item">
+        <a class="nav__link" href="pages/story.html">剧情之旅</a>
+      </li>
+      <li class="nav__item">
+        <a class="nav__link" href="pages/battle.html">战斗指南</a>
+      </li>
+      <li class="nav__item">
+        <a class="nav__link" href="pages/gallery.html">画廊</a>
+      </li>
+      <li class="nav__item">
+        <a class="nav__link" href="pages/pubmed.html">文献检索</a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- ===================== 主内容区 ===================== -->
+  <main class="site-main">
+
+    <!-- 英雄横幅 -->
+    <section class="hero-banner">
+      <div class="hero-bg" id="heroBg"></div>
+      <div class="hero-overlay">
+        <h1 class="hero-title">OCTOPATH<br>TRAVELER</h1>
+        <p class="hero-subtitle">八位旅人 · 八段旅程 · 八种命运</p>
+        <div class="hero-gem-line">
+          <span class="gem-dot"></span>
+          <span class="gem-dot"></span>
+          <span class="gem-dot"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 角色档案区 -->
+    <section class="section" id="characters">
+      <div class="section-header">
+        <div class="section-divider">
+          <span class="section-divider__line"></span>
+          <span class="section-divider__gem"></span>
+          <span class="section-divider__line"></span>
+        </div>
+        <h2 class="section-title">旅人名录</h2>
+        <p class="section-subtitle">八位主角 · 八条命运之路</p>
+      </div>
+
+      <div class="character-grid">
+
+        <!-- 剑士 欧贝利克 -->
+        <div class="char-card" data-char="olberic" onclick="openCharModal('olberic')">
+          <img class="char-card__image" src="图集/olberic.png" alt="欧贝利克" onerror="this.style.display='none'">
+          <span class="corner-bl"></span>
+          <span class="corner-br"></span>
+          <div class="char-card__name">
+            <div class="char-card__name-cn">欧贝利克</div>
+            <div class="char-card__name-en">Olberic</div>
+            <span class="char-card__job">剑士</span>
+          </div>
+        </div>
+
+        <!-- 盗贼 提利昂 -->
+        <div class="char-card" data-char="therion" onclick="openCharModal('therion')">
+          <img class="char-card__image" src="图集/therion.jpg" alt="提利昂" onerror="this.style.display='none'">
+          <span class="corner-bl"></span>
+          <span class="corner-br"></span>
+          <div class="char-card__name">
+            <div class="char-card__name-cn">提利昂</div>
+            <div class="char-card__name-en">Therion</div>
+            <span class="char-card__job">盗贼</span>
+          </div>
+        </div>
+
+        <!-- 猎人 海茵特 -->
+        <div class="char-card" data-char="haanit" onclick="openCharModal('haanit')">
+          <img class="char-card__image" src="图集/haanit.png" alt="海茵特" onerror="this.style.display='none'">
+          <span class="corner-bl"></span>
+          <span class="corner-br"></span>
+          <div class="char-card__name">
+            <div class="char-card__name-cn">海茵特</div>
+            <div class="char-card__name-en">H'aanit</div>
+            <span class="char-card__job">猎人</span>
+          </div>
+        </div>
+
+        <!-- 舞女 普里姆萝斯 -->
+        <div class="char-card" data-char="primrose" onclick="openCharModal('primrose')">
+          <img class="char-card__image" src="图集/primrose.png" alt="普里姆萝斯" onerror="this.style.display='none'">
+          <span class="corner-bl"></span>
+          <span class="corner-br"></span>
+          <div class="char-card__name">
+            <div class="char-card__name-cn">普里姆萝斯</div>
+            <div class="char-card__name-en">Primrose</div>
+            <span class="char-card__job">舞女</span>
+          </div>
+        </div>
+
+        <!-- 学者 赛拉斯 -->
+        <div class="char-card" data-char="cyrus" onclick="openCharModal('cyrus')">
+          <img class="char-card__image" src="图集/cyrus.png" alt="赛拉斯" onerror="this.style.display='none'">
+          <span class="corner-bl"></span>
+          <span class="corner-br"></span>
+          <div class="char-card__name">
+            <div class="char-card__name-cn">赛拉斯</div>
+            <div class="char-card__name-en">Cyrus</div>
+            <span class="char-card__job">学者</span>
+          </div>
+        </div>
+
+        <!-- 神官 奥菲利亚 -->
+        <div class="char-card" data-char="ophilia" onclick="openCharModal('ophilia')">
+          <img class="char-card__image" src="图集/ophilia.png" alt="奥菲利亚" onerror="this.style.display='none'">
+          <span class="corner-bl"></span>
+          <span class="corner-br"></span>
+          <div class="char-card__name">
+            <div class="char-card__name-cn">奥菲利亚</div>
+            <div class="char-card__name-en">Ophilia</div>
+            <span class="char-card__job">神官</span>
+          </div>
+        </div>
+
+        <!-- 药师 阿芬 -->
+        <div class="char-card" data-char="alfyn" onclick="openCharModal('alfyn')">
+          <img class="char-card__image" src="图集/alfyn.png" alt="阿芬" onerror="this.style.display='none'">
+          <span class="corner-bl"></span>
+          <span class="corner-br"></span>
+          <div class="char-card__name">
+            <div class="char-card__name-cn">阿芬</div>
+            <div class="char-card__name-en">Alfyn</div>
+            <span class="char-card__job">药师</span>
+          </div>
+        </div>
+
+        <!-- 商人 特蕾莎 -->
+        <div class="char-card" data-char="tressa" onclick="openCharModal('tressa')">
+          <img class="char-card__image" src="图集/tressa.png" alt="特蕾莎" onerror="this.style.display='none'">
+          <span class="corner-bl"></span>
+          <span class="corner-br"></span>
+          <div class="char-card__name">
+            <div class="char-card__name-cn">特蕾莎</div>
+            <div class="char-card__name-en">Tressa</div>
+            <span class="char-card__job">商人</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 大陆纪行区 -->
+    <section class="section" id="world">
+      <div class="section-header">
+        <div class="section-divider">
+          <span class="section-divider__line"></span>
+          <span class="section-divider__gem"></span>
+          <span class="section-divider__line"></span>
+        </div>
+        <h2 class="section-title">奥鲁斯特拉大陆</h2>
+        <p class="section-subtitle">昼夜交替 · 探索八域</p>
+      </div>
+
+      <div class="region-grid">
+
+        <div class="region-card">
+          <div class="region-card__image"><img src="图集/snow1.png" alt="冰川" onerror="this.style.display='none'"><span class="region-label">冰川大陆地区</span></div>
+          <div class="region-card__body">
+            <div class="region-card__name">冰川大陆地区</div>
+            <div class="region-card__desc">寒风呼啸的永冻之地，古老遗迹沉睡于冰雪之下</div>
+          </div>
+        </div>
+
+        <div class="region-card">
+          <div class="region-card__image"><img src="图集/town1.png" alt="平原" onerror="this.style.display='none'"><span class="region-label">平原大陆地区</span></div>
+          <div class="region-card__body">
+            <div class="region-card__name">平原大陆地区</div>
+            <div class="region-card__desc">麦浪滚滚的丰饶之地，城堡与村庄星罗棋布</div>
+          </div>
+        </div>
+
+        <div class="region-card">
+          <div class="region-card__image"><img src="图集/coast1.png" alt="海岸" onerror="this.style.display='none'"><span class="region-label">海岸大陆地区</span></div>
+          <div class="region-card__body">
+            <div class="region-card__name">海岸大陆地区</div>
+            <div class="region-card__desc">碧海银沙的贸易港都，商船往来帆影点点</div>
+          </div>
+        </div>
+
+        <div class="region-card">
+          <div class="region-card__image"><img src="图集/highland1.png" alt="高原" onerror="this.style.display='none'"><span class="region-label">高原大陆地区</span></div>
+          <div class="region-card__body">
+            <div class="region-card__name">高原大陆地区</div>
+            <div class="region-card__desc">云端之上的险峻高原，矿山与要塞密布</div>
+          </div>
+        </div>
+
+        <div class="region-card">
+          <div class="region-card__image"><img src="图集/desert1.png" alt="沙漠" onerror="this.style.display='none'"><span class="region-label">阳光大陆地区</span></div>
+          <div class="region-card__body">
+            <div class="region-card__name">阳光大陆地区</div>
+            <div class="region-card__desc">黄沙漫漫的炽热荒漠，绿洲与古城静默伫立</div>
+          </div>
+        </div>
+
+        <div class="region-card">
+          <div class="region-card__image"><img src="图集/river1.png" alt="河川" onerror="this.style.display='none'"><span class="region-label">河川大陆地区</span></div>
+          <div class="region-card__body">
+            <div class="region-card__name">河川大陆地区</div>
+            <div class="region-card__desc">水网纵横的湿润水乡，舟楫如梭稻花飘香</div>
+          </div>
+        </div>
+
+        <div class="region-card">
+          <div class="region-card__image"><img src="图集/ruins1.png" alt="断崖" onerror="this.style.display='none'"><span class="region-label">断崖大陆地区</span></div>
+          <div class="region-card__body">
+            <div class="region-card__name">断崖大陆地区</div>
+            <div class="region-card__desc">巨壁如削的险峻绝境，鹰隼盘旋云雾缭绕</div>
+          </div>
+        </div>
+
+        <div class="region-card">
+          <div class="region-card__image"><img src="图集/forest1.png" alt="丛林" onerror="this.style.display='none'"><span class="region-label">丛林大陆地区</span></div>
+          <div class="region-card__body">
+            <div class="region-card__name">丛林大陆地区</div>
+            <div class="region-card__desc">密林深处的神秘禁地，古代文明遗迹隐匿其中</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== 底部 ===================== -->
+  <footer class="site-footer">
+    <div class="footer__links">
+      <a href="mailto:3139507341@qq.com">联系我们：3139507341@qq.com</a>
+    </div>
+    <p class="footer__copyright">
+      © 2026 Octopath Traveler 主题网站 · Web编程大作业 · 基于Hermes框架构建
+    </p>
+  </footer>
+
+  <!-- ===================== 音乐控制条 ===================== -->
+  <div class="music-bar" id="musicBar">
+    <div class="music-bar__info">
+      <span class="music-bar__gem"></span>
+      <span class="music-bar__track" id="musicTrack">游戏主旋律</span>
+    </div>
+    <div class="music-bar__controls">
+      <button class="btn-icon" id="btnPrev" title="上一曲">⏮</button>
+      <button class="btn-icon" id="btnPlayPause" title="播放/暂停">▶</button>
+      <button class="btn-icon" id="btnNext" title="下一曲">⏭</button>
+      <button class="btn-icon" id="btnSound" title="音效开关">🔊</button>
+      <input type="range" class="volume-slider" id="volSlider" min="0" max="100" value="70" title="音量">
+    </div>
+  </div>
+
+  <!-- ===================== 登录弹窗 ===================== -->
+  <div class="login-modal" id="loginModal">
+    <div class="login-modal__box">
+      <button class="btn-close" id="btnCloseLogin">×</button>
+      <h3 class="login-modal__title">旅人登录</h3>
+      <form id="loginForm" onsubmit="return handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="inputStudentId">学号</label>
+          <input type="text" class="form-input" id="inputStudentId"
+                 placeholder="请输入10位学号" maxlength="10" autocomplete="username">
+          <div class="form-error" id="idError"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="inputPassword">密码</label>
+          <input type="password" class="form-input" id="inputPassword"
+                 placeholder="初始密码：2026" autocomplete="current-password">
+          <div class="form-error" id="pwError"></div>
+        </div>
+        <button type="submit" class="btn-submit">进入旅途</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== 防沉迷锁定遮罩 ===================== -->
+  <div class="lock-overlay" id="lockOverlay">
+    <div class="lock-overlay__icon">⏳</div>
+    <div class="lock-overlay__msg">休息一下，继续前行</div>
+    <div class="lock-overlay__timer" id="lockTimer">10:00</div>
+    <p style="font-size:0.8rem;color:#8b949e;">锁定中，请稍作休息</p>
+  </div>
+
+  <!-- ===================== 角色详情弹窗 ===================== -->
+  <div class="login-modal" id="charModal" style="z-index:2500;">
+    <div class="login-modal__box" style="width:520px;max-height:85vh;overflow-y:auto;">
+      <button class="btn-close" id="btnCloseChar">×</button>
+      <div id="charModalContent">
+        <!-- 动态填充 -->
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

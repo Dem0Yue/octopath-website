@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>职业系统 - Octopath Traveler</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .jobs-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; padding:40px 24px; max-width:1200px; margin:0 auto; }
+    .job-card { background:var(--color-bg-card); border:1px solid var(--color-border); border-radius:var(--border-radius); padding:24px; transition:all 0.3s; cursor:pointer; }
+    .job-card:hover { border-color:rgba(110,64,170,0.5); box-shadow:0 8px 30px rgba(0,0,0,0.4); transform:translateY(-4px); }
+    .job-icon { font-size:2rem; margin-bottom:12px; }
+    .job-name { font-size:1rem; font-weight:700; color:var(--color-text-primary); margin-bottom:4px; }
+    .job-en { font-size:0.7rem; color:var(--color-text-muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:12px; }
+    .job-desc { font-size:0.8rem; color:var(--color-text-secondary); line-height:1.6; margin-bottom:12px; }
+    .job-attr { display:flex; flex-wrap:wrap; gap:6px; }
+    .attr-tag { padding:3px 10px; background:rgba(110,64,170,0.15); border:1px solid rgba(110,64,170,0.3); border-radius:20px; font-size:0.65rem; color:var(--color-hover); }
+    /* 职业详情浮层 */
+    .job-detail-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:2000; }
+    .job-detail-overlay.open { display:flex; }
+    .job-detail-box { background:var(--color-bg-secondary); border:1px solid var(--color-border); border-radius:var(--border-radius); padding:36px 40px; width:560px; max-width:90vw; max-height:85vh; overflow-y:auto; }
+    .section { padding:60px 24px 0; max-width:1400px; margin:0 auto; }
+    @media(max-width:1024px) { .jobs-grid { grid-template-columns:repeat(3,1fr); } }
+    @media(max-width:768px) { .jobs-grid { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:480px) { .jobs-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header__left"><span class="header__logo">OCTOPATH</span><span class="header__subtitle">八方旅人 · HD-2D</span></div>
+    <div class="header__right">
+      <div class="clock-widget" id="clockWidget">00:00:00</div>
+      <div class="countdown-widget" id="countdownWidget">--:--:--</div>
+      <button class="btn-login" id="btnLogin">登 录</button>
+      <div class="user-info" id="userInfo" style="display:none;"><span class="gem-dot"></span><span class="user-name" id="userName"></span></div>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <ul class="nav__primary">
+      <li class="nav__item"><a class="nav__link" href="../index.html">首页</a></li>
+      <li class="nav__item"><a class="nav__link" href="characters.html">角色档案</a></li>
+      <li class="nav__item active"><a class="nav__link" href="jobs.html">职业系统</a></li>
+      <li class="nav__item"><a class="nav__link" href="world.html">大陆纪行</a></li>
+      <li class="nav__item"><a class="nav__link" href="story.html">剧情之旅</a></li>
+      <li class="nav__item"><a class="nav__link" href="battle.html">战斗指南</a></li>
+      <li class="nav__item"><a class="nav__link" href="gallery.html">画廊</a></li>
+      <li class="nav__item"><a class="nav__link" href="pubmed.html">文献检索</a></li>
+    </ul>
+  </nav>
+
+  <main style="margin-top:calc(var(--header-height) + var(--nav-height));">
+    <div class="section">
+      <h2 class="section-title">职业系统</h2>
+      <p class="section-subtitle">八大基础职业 · 各具特色的战斗定位</p>
+    </div>
+
+    <div class="jobs-grid" id="jobsGrid"></div>
+  </main>
+
+  <div class="job-detail-overlay" id="jobDetailOverlay">
+    <div class="job-detail-box">
+      <button class="btn-close" onclick="closeJobDetail()" style="position:absolute;top:12px;right:16px;font-size:1.5rem;color:var(--color-text-muted);background:none;border:none;cursor:pointer;">×</button>
+      <div id="jobDetailContent"></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer__links"><a href="mailto:3139507341@qq.com">联系我们：3139507341@qq.com</a></div>
+    <p class="footer__copyright">© 2026 Octopath Traveler 主题网站</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script>
+    const JOBS = [
+      { id:'warrior', icon:'⚔️', name:'剑士', en:'Warrior', chars:'欧贝利克', weapon:'剑/枪', elem:'无属性', role:'物理肉盾/副输出', desc:'以剑与枪为武器的物理型职业，擅长防守与反击。被动技能"掩护"可以在队友濒死时代替其承受伤害，是队伍中最可靠的盾牌。', skills:['横一文字斩（全体剑）','蓄力（物攻↑3T）','挑拨（吸引仇恨）','鉄壁（物防↑3T）','十文字斩（单体剑）'] },
+      { id:'scholar', icon:'📖', name:'学者', en:'Scholar', chars:'赛拉斯', weapon:'杖', elem:'火/冰/雷', role:'法系输出核心', desc:'掌握火、冰、雷三种属性魔法的职业。战斗中可以"调查"敌人弱点，每种属性对应不同的破盾效果，是探索地图秘密的关键。', skills:['火炎魔法（全体火）','冰结魔法（全体冰）','雷击魔法（全体雷）','予习（预知弱点）','大魔法（特大属性）'] },
+      { id:'thief', icon:'🗡️', name:'盗贼', en:'Thief', chars:'提里昂', weapon:'短剑/剑', elem:'暗属性', role:'单体物理输出', desc:'以速度和暴击见长的刺客型职业。擅长偷取敌人道具，战斗中可降低敌方物理攻击与防御，是削弱敌人战力的专家。', skills:['偷盗（获取道具）','上锁（阻止逃跑）','暗器投掷（单体暗）','隐蔽（回避↑）','毒刃（附加中毒）'] },
+      { id:'cleric', icon:'✨', name:'神官', en:'Cleric', chars:'奥菲利亚', weapon:'杖', elem:'光属性', role:'奶妈/副法输出', desc:'神圣之光的使用者，擅长治疗与辅助。全体回复魔法是队伍续航的核心，复活用魔法可在团灭边缘拯救全队。', skills:['回复魔法（全体HP回复）','圣光（单体光属性）','守护（属防↑）','大回复魔法（全体大回复）','复活魔法（全体复活）'] },
+      { id:'dancer', icon:'💃', name:'舞女', en:'Dancer', chars:'普里姆萝斯', weapon:'短剑', elem:'风属性', role:'增益辅助', desc:'以优雅舞步为队友提供各种增益的辅助型职业。"强化回合数增加"被动可以让所有buff效果延长一回合，是后期队伍不可或缺的辅助。', skills:['舞蹈（全体风属性）','希望之歌（buff延长）','诱惑之舞（敌人混乱）','齐心协力（协助攻击）','月影（单体风高伤）'] },
+      { id:'apothecary', icon:'⚗️', name:'药师', en:'Apothecary', chars:'阿芬', weapon:'斧', elem:'冰属性', role:'减益辅助', desc:'使用斧头战斗并精通调和技术的职业。可以制作各种恢复道具，给敌人施加减益状态，是战场上的战术大师。', skills:['调药（制作恢复）','毒药（敌人中毒）','体力药剂（单体大回复）','活力灵药（全体SP回复）','调和（高阶药剂）'] },
+      { id:'merchant', icon:'💰', name:'商人', en:'Merchant', chars:'特蕾莎', weapon:'长枪/弓', elem:'火属性', role:'综合辅助', desc:'精于贸易与雇佣的独特职业。"雇用"指令可以花钱雇佣NPC协助战斗或服务，是唯一能带动全队攻击力的职业。', skills:['雇用（临时伙伴）','物品收集（购买道具）','全员激励（我方攻击↑）','讨价还价（商店折扣）','连携攻击（组合攻击）'] },
+      { id:'hunter', icon:'🏹', name:'猎人', en:'Hunter', chars:'海茵特', weapon:'弓/斧', elem:'雷属性', role:'综合输出', desc:'与魔物并肩作战的远程职业。弓系技能伤害稳定，"捕获"指令可以驯服衰弱的魔物为战斗伙伴，是战场上的多面手。', skills:['乱射（随机弓5~8回）','会心之矢（必爆击）','电鸟（单体雷）','网（减慢敌人行动）','目标锁定（全队爆击↑）'] },
+    ];
+
+    const grid = document.getElementById('jobsGrid');
+    JOBS.forEach(job => {
+      const div = document.createElement('div');
+      div.className = 'job-card';
+      div.onclick = () => openJobDetail(job);
+      div.innerHTML = `
+        <div class="job-icon">${job.icon}</div>
+        <div class="job-name">${job.name}</div>
+        <div class="job-en">${job.en}</div>
+        <div class="job-desc">${job.desc.substring(0,60)}...</div>
+        <div class="job-attr">
+          ${job.weapon.split('/').map(w => `<span class="attr-tag">${w.trim()}</span>`).join('')}
+          <span class="attr-tag">${job.elem}</span>
+        </div>
+      `;
+      grid.appendChild(div);
+    });
+
+    function openJobDetail(job) {
+      document.getElementById('jobDetailContent').innerHTML = `
+        <div style="font-size:2rem;margin-bottom:12px;">${job.icon}</div>
+        <div style="font-size:1.4rem;font-weight:700;color:var(--color-text-primary);margin-bottom:4px;">${job.name}</div>
+        <div style="font-size:0.7rem;color:var(--color-text-muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:20px;">${job.en} · 代表角色：${job.chars}</div>
+        <div style="margin-bottom:16px;">
+          <div style="font-size:0.75rem;color:var(--color-text-muted);margin-bottom:6px;">职业定位</div>
+          <div style="display:inline-block;padding:4px 14px;background:rgba(110,64,170,0.2);border:1px solid rgba(110,64,170,0.4);border-radius:20px;font-size:0.8rem;color:var(--color-hover);">${job.role}</div>
+        </div>
+        <p style="font-size:0.9rem;color:#8b949e;line-height:1.8;margin-bottom:20px;">${job.desc}</p>
+        <div style="margin-bottom:8px;font-size:0.75rem;color:var(--color-text-muted);">武器：${job.weapon}</div>
+        <div style="margin-bottom:20px;font-size:0.75rem;color:var(--color-text-muted);">属性：${job.elem}</div>
+        <div style="font-size:0.75rem;color:var(--color-text-muted);margin-bottom:8px;">核心技能</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${job.skills.map(s => `<span style="padding:4px 12px;background:rgba(110,64,170,0.15);border:1px solid rgba(110,64,170,0.3);border-radius:20px;font-size:0.75rem;color:var(--color-hover);">${s}</span>`).join('')}
+        </div>
+      `;
+      document.getElementById('jobDetailOverlay').classList.add('open');
+    }
+
+    function closeJobDetail() {
+      document.getElementById('jobDetailOverlay').classList.remove('open');
+    }
+  </script>
+</body>
+</html>

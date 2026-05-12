@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>战斗指南 - Octopath Traveler</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .battle-section { max-width:1100px; margin:40px auto; padding:0 24px 60px; }
+    .battle-card { background:var(--color-bg-card); border:1px solid var(--color-border); border-radius:var(--border-radius); padding:28px; margin-bottom:24px; }
+    .battle-card h3 { font-size:1rem; color:var(--color-hover); letter-spacing:0.1em; margin-bottom:16px; border-left:3px solid var(--color-hover); padding-left:12px; }
+    .battle-card p { font-size:0.9rem; color:var(--color-text-secondary); line-height:1.9; margin-bottom:12px; }
+    .mechanic-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:16px; }
+    .mech-card { background:var(--color-bg-secondary); border-radius:8px; padding:20px; text-align:center; }
+    .mech-icon { font-size:2rem; margin-bottom:10px; }
+    .mech-name { font-size:0.85rem; font-weight:700; color:var(--color-text-primary); margin-bottom:6px; }
+    .mech-desc { font-size:0.75rem; color:var(--color-text-secondary); line-height:1.5; }
+    .bp-flow { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:12px; }
+    .bp-step { padding:6px 14px; background:rgba(110,64,170,0.2); border:1px solid rgba(110,64,170,0.4); border-radius:20px; font-size:0.75rem; color:var(--color-hover); }
+    .bp-arrow { color:var(--color-text-muted); }
+    .section { padding:60px 24px 0; max-width:1400px; margin:0 auto; }
+    @media(max-width:768px) { .mechanic-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header__left"><span class="header__logo">OCTOPATH</span><span class="header__subtitle">八方旅人 · HD-2D</span></div>
+    <div class="header__right">
+      <div class="clock-widget" id="clockWidget">00:00:00</div>
+      <div class="countdown-widget" id="countdownWidget">--:--:--</div>
+      <button class="btn-login" id="btnLogin">登 录</button>
+      <div class="user-info" id="userInfo" style="display:none;"><span class="gem-dot"></span><span class="user-name" id="userName"></span></div>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+    <ul class="nav__primary">
+      <li class="nav__item"><a class="nav__link" href="../index.html">首页</a></li>
+      <li class="nav__item"><a class="nav__link" href="characters.html">角色档案</a></li>
+      <li class="nav__item"><a class="nav__link" href="jobs.html">职业系统</a></li>
+      <li class="nav__item"><a class="nav__link" href="world.html">大陆纪行</a></li>
+      <li class="nav__item"><a class="nav__link" href="story.html">剧情之旅</a></li>
+      <li class="nav__item active"><a class="nav__link" href="battle.html">战斗指南</a></li>
+      <li class="nav__item"><a class="nav__link" href="gallery.html">画廊</a></li>
+      <li class="nav__item"><a class="nav__link" href="pubmed.html">文献检索</a></li>
+    </ul>
+  </nav>
+
+  <main style="margin-top:calc(var(--header-height) + var(--nav-height));">
+    <div class="section">
+      <h2 class="section-title">战斗指南</h2>
+      <p class="section-subtitle">回合制战斗 · 弱点破盾 · BP boost · 职业协同</p>
+    </div>
+
+    <div class="battle-section">
+      <!-- 弱点破盾系统 -->
+      <div class="battle-card">
+        <h3>🛡️ 弱点破盾系统</h3>
+        <p>每名敌人拥有护盾点数（Shield Points），位于敌人头像下方。使用对应弱点属性的攻击命中敌人，可以削减1点护盾。当护盾归零时，敌人进入「崩溃」状态——该回合内所受伤害翻倍，且无法行动。</p>
+        <p>利用属性弱点破盾是《八方旅人》战斗的核心策略。合理搭配队伍中不同属性的角色，可以在短时间内触发多次崩溃，最大化输出伤害。</p>
+        <div class="mechanic-grid">
+          <div class="mech-card"><div class="mech-icon">⚔️</div><div class="mech-name">剑 / 枪</div><div class="mech-desc">物理型，常见于剑士、战士类敌人</div></div>
+          <div class="mech-card"><div class="mech-icon">🔥</div><div class="mech-name">火 / 冰 / 雷</div><div class="mech-desc">学者专属三属性，克制面广</div></div>
+          <div class="mech-card"><div class="mech-icon">💡</div><div class="mech-name">光 / 暗 / 风</div><div class="mech-desc">神官、舞女、盗贼的专属属性</div></div>
+          <div class="mech-card"><div class="mech-icon">🏹</div><div class="mech-name">弓 / 斧</div><div class="mech-desc">猎人物理输出，破盾稳定</div></div>
+          <div class="mech-card"><div class="mech-icon">⚡</div><div class="mech-name">雷属性</div><div class="mech-desc">猎人专属，高段数攻击</div></div>
+          <div class="mech-card"><div class="mech-icon">💎</div><div class="mech-name">复合弱点</div><div class="mech-desc">高阶敌人拥有多个属性弱点</div></div>
+        </div>
+      </div>
+
+      <!-- BP 系统 -->
+      <div class="battle-card">
+        <h3>⚡ BP（Boost Point）系统</h3>
+        <p>BP（Boost Point）是《八方旅人》战斗的核心资源。每名角色每回合开始时获得1点BP（最多3点），使用 BP 可以「强化」当前行动——消耗更多 BP 来提升技能效果。</p>
+        <p>合理的 BP 分配是高难度战斗的关键。建议在敌人护盾归零、进入崩溃状态时集中输出，最大化伤害收益。</p>
+        <div class="bp-flow">
+          <span class="bp-step">1BP: 效果×1</span>
+          <span class="bp-arrow">→</span>
+          <span class="bp-step">2BP: 效果×2 + 追加效果</span>
+          <span class="bp-arrow">→</span>
+          <span class="bp-step">3BP: 效果×3 + 强力追加</span>
+        </div>
+        <div class="mechanic-grid" style="margin-top:16px;">
+          <div class="mech-card"><div class="mech-icon">📈</div><div class="mech-name">伤害强化</div><div class="mech-desc">2BP以上时伤害段数或数值大幅提升</div></div>
+          <div class="mech-card"><div class="mech-icon">🎯</div><div class="mech-name">追加目标</div><div class="mech-desc">部分技能在BP强化后可攻击多个目标</div></div>
+          <div class="mech-card"><div class="mech-icon">⏩</div><div class="mech-name">行动提前</div><div class="mech-desc">消耗2BP可让角色下回合更早行动</div></div>
+        </div>
+      </div>
+
+      <!-- 职业协同 -->
+      <div class="battle-card">
+        <h3>🤝 职业协同与组队策略</h3>
+        <p>八位旅人各有独特职业，合理组队可以产生强大的协同效果。以下是几种经典组队思路：</p>
+        <div class="mechanic-grid">
+          <div class="mech-card"><div class="mech-icon">⚔️📖</div><div class="mech-name">剑士 + 学者</div><div class="mech-desc">剑士吸收伤害，学者利用多属性破盾，攻防兼备</div></div>
+          <div class="mech-card"><div class="mech-icon">💃🛡️</div><div class="mech-name">舞女 + 神官</div><div class="mech-desc">舞女延长增益时间，神官提供治疗与光属性支援</div></div>
+          <div class="mech-card"><div class="mech-icon">🏹⚗️</div><div class="mech-name">猎人 + 药师</div><div class="mech-desc">猎人高段数破盾，药师提供减益与治疗续航</div></div>
+          <div class="mech-card"><div class="mech-icon">💰🔥</div><div class="mech-name">商人 + 任意</div><div class="mech-desc">商人的全员攻击强化可叠加在任何战术上</div></div>
+          <div class="mech-card"><div class="mech-icon">🗡️✨</div><div class="mech-name">盗贼 + 神官</div><div class="mech-desc">盗贼削弱敌人防御，神官光属性收割</div></div>
+          <div class="mech-card"><div class="mech-icon">🎭💃</div><div class="mech-name">舞女 + 学者</div><div class="mech-desc">舞女buff延长使学者多属性技能收益最大化</div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer__links"><a href="mailto:3139507341@qq.com">联系我们：3139507341@qq.com</a></div>
+    <p class="footer__copyright">© 2026 Octopath Traveler 主题网站</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
